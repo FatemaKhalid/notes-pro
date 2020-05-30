@@ -1,0 +1,22 @@
+.form-container{
+    max-width: 500px;
+    margin: auto;
+    // .field{
+    margin-top: 50px;
+    // }
+    .input{
+        background-color:#eee;
+    }
+    textarea{
+        background-color:#eee;
+        min-height: 150px;
+    }
+    input, textarea{
+        &.ng-invalid.ng-touched{
+            border-color: rgba( red, 0.4);
+            &:focus{
+                box-shadow: 0px 0px 0px 2px rgba( red, 0.1);
+            }
+        }  
+    }
+}
