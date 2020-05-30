@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild, ElementRef, Renderer2, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer2, Input, Output, EventEmitter } from '@angular/core';
+
 
 @Component({
   selector: 'app-note-card',
@@ -9,10 +10,12 @@ export class NoteCardComponent implements OnInit {
   
   @Input() title: string;
   @Input() body: string;
+  @Input() link: string;
   @ViewChild('truncator') truncator: ElementRef<HTMLElement>;
   @ViewChild('bodyText') bodyText: ElementRef<HTMLElement>;
   @ViewChild('container') container: ElementRef<HTMLElement>;
-  
+  @Output('delete') deleteEvent: EventEmitter<void> = new EventEmitter<void>();
+
   constructor(private renderer: Renderer2) { }
    ngOnInit():void{
 
@@ -28,6 +31,9 @@ export class NoteCardComponent implements OnInit {
       //we hide the truncator
       this.renderer.setStyle(this.truncator.nativeElement,'display','none');
     }
+  }
+  onXbuttonClick(){
+    this.deleteEvent.emit();
   }
 
 }
