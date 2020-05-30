@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Note } from 'src/app/shared/note.module';
 import { NotesService } from 'src/app/shared/notes.service';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
@@ -83,15 +83,19 @@ export class NoteListComponent implements OnInit {
   notes: Note[] = new Array<Note>();
   filteredNotes: Note[] = new Array<Note>();
   
+  @ViewChild('filterInput') filterInputElementRef: ElementRef<HTMLInputElement>;
   constructor(private noteService:NotesService) { }
 
   ngOnInit(): void {
     this.notes = this.noteService.getAll();
-    this.filteredNotes = this.notes;
+    //this.filteredNotes = this.noteService.getAll();
+    this.filter('');
   }
 
-  deleteNote(id: number){
-    this.noteService.delete(id);
+  deleteNote(note: Note){
+    let noteId = this.noteService.getId(note);
+    this.noteService.delete(noteId);
+    this.filter(this.filterInputElementRef.nativeElement.value);
   }
 
   removeDuplicate(arr: Array<any>) : Array<any>{
@@ -119,6 +123,7 @@ export class NoteListComponent implements OnInit {
     // Because a note can appear by multiple terms
     let uniqueResults = this.removeDuplicate(allResults);
     this.filteredNotes = uniqueResults;
+    this.sortByRelevacy(allResults);
   }
   relevantNotes(query:string): Array<Note>{
     query = query.toLocaleLowerCase().trim();
@@ -135,5 +140,34 @@ export class NoteListComponent implements OnInit {
       else {return false;}
     })
     return relevantNotes;
+  }
+  sortByRelevacy(searchResults: Array<Note>){
+    // This method calculates the relevancy of a note based on
+    // number of times it appears in search results
+
+    // format - key:value =>
+    // noteId:number (noteObjectId : count of frequency in search results)
+    let noteCountObj: Object={}; 
+    searchResults.forEach(note => {
+      let noteId = this.noteService.getId(note);
+      if(noteCountObj[noteId]){
+        ++noteCountObj[noteId];
+      }else {
+        noteCountObj[noteId] = 1;
+      }
+    });
+    this.filteredNotes = this.filteredNotes.sort((a:Note, b:Note)=> {
+      let aId = this.noteService.getId(a);
+      let bId = this.noteService.getId(b);
+      
+      let aCount = noteCountObj[aId];
+      let bCount = noteCountObj[bId];
+
+      return bCount - aCount;
+    });
+  }
+  generateNoteURL(note:Note){
+    let noteId = this.noteService.getId(note);
+    return noteId;
   }
 }
