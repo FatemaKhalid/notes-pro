@@ -1,4 +1,4 @@
-# NotesApp
+# NotesPro
 Notes Application from scratch using the #Angular framework.
 
 ## Development server
